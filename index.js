@@ -15,7 +15,9 @@ class Field{
 
     print(){
         // Function prints map to console
-        console.log(this._map);
+        this._map.forEach(row => {
+            console.log(row.join(' '));
+        });
     }
 
     moveUser(direction){
@@ -68,3 +70,11 @@ class Field{
         // TODO 
     }
 }
+
+const myField = new Field([
+    ['*', '░', 'O'],
+    ['░', 'O', '░'],
+    ['░', '^', '░'],
+]);
+
+myField.print();
