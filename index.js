@@ -1,5 +1,28 @@
 const prompt = require('prompt-sync')({sigint: true});
 
+const generateRandomPair = (fisrtLowBound, firstUpBound, secondLowBound, secondUpBound) => {
+    const firstInt = Math.floor(Math.random() * (firstUpBound - fisrtLowBound + 1)) + fisrtLowBound;
+    const secondInt = Math.floor(Math.random() * (secondUpBound - secondLowBound + 1)) + secondLowBound;
+    return [firstInt, secondInt];
+}
+
+const generateUniquePairs = (amount, restrictionSet, fisrtLowBound, firstUpBound, secondLowBound, secondUpBound) => {
+    const result = [];
+    const usedPairs = new Set();
+
+    while (result.length < amount) {
+        const pair = generateRandomPair(fisrtLowBound, firstUpBound, secondLowBound, secondUpBound);
+
+        const pairString = pair.join(', ');
+        if (!usedPairs.has(pairString) && !restrictionSet.has(pairString)) {
+            result.push(pair);
+            usedPairs.add(pairString);
+        }
+    }
+
+    return result;
+}
+
 const hat = '^';
 const hole = 'O';
 const fieldCharacter = '░';
@@ -73,19 +96,35 @@ class Field{
     }
 
     static generateMap(width, height, percentage){
-        // Function generate random map with given percantage of holes. 
-        // TODO 
+        // Function generates random map with given percantage of holes. 
+        const map = Array.from({ length: height }, () => Array(width).fill(fieldCharacter));    // At firts fill field with fieldCharacters
+
+        // Locate user and hat
+        map[0][0] = pathCharacter;  
+        const [hatX, hatY] = generateRandomPair(0, width - 1, 0, height - 1);
+        map[hatY][hatX] = hat;
+
+        // Genrate holes
+        const amountOfHoles = width * height * percentage / 100;
+        const restrictionSet = new Set(['0, 0', `${hatX}, ${hatY}`]);
+        const holesPositions = generateUniquePairs(amountOfHoles, restrictionSet, 0, width - 1, 0, height - 1);
+
+        // Put holes on a map
+        holesPositions.forEach(position => {
+            const [x, y] = position
+            map[y][x] = hole;
+        });
+
+        return map;
     }
 }
 
-const myField = new Field([
-    ['*', '░', 'O'],
-    ['░', 'O', '░'],
-    ['░', '^', '░'],
-]);
+
+const myField = new Field(Field.generateMap(10, 10, 30));
 
 let state = 'run';  // Possible states: run, win, lose
 while (state === 'run'){
+    console.clear();
     myField.updateMap();
     myField.print();
 
