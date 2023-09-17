@@ -1,4 +1,5 @@
 const prompt = require('prompt-sync')({sigint: true});
+const terminal = require( 'terminal-kit' ).terminal;
 
 const generateRandomPair = (fisrtLowBound, firstUpBound, secondLowBound, secondUpBound) => {
     const firstInt = Math.floor(Math.random() * (firstUpBound - fisrtLowBound + 1)) + fisrtLowBound;
@@ -23,6 +24,11 @@ const generateUniquePairs = (amount, restrictionSet, fisrtLowBound, firstUpBound
     return result;
 }
 
+const validateMaze = (maze) => {
+    // Returns true if given maze is solvable
+    // TODO 
+}
+
 const hat = '^';
 const hole = 'O';
 const fieldCharacter = '░';
@@ -38,9 +44,21 @@ class Field{
 
     print(){
         // Function prints map to console
-        this._map.forEach(row => {
-            console.log(row.join(' '));
-        });
+        for (let y = 0; y < this._height; y++) {
+            for (let x = 0; x < this._width; x++){
+                if (x === this._userPos.x && y === this._userPos.y)
+                    terminal.green(this._map[y][x]);
+                else if (this._map[y][x] === hat)
+                    terminal.yellow(hat);
+                else if (this._map[y][x] === pathCharacter)
+                    terminal.gray(pathCharacter);
+                else if (this._map[y][x] === fieldCharacter)
+                    terminal(fieldCharacter);
+                else
+                    terminal.red(hole);
+            }
+            terminal('\n');
+        }
     }
 
     moveUser(direction){
@@ -130,12 +148,16 @@ while (state === 'run'){
 
     let userInput = prompt('Which way? ');
 
-    myField.moveUser(userInput.toLowerCase());
-    state = myField.checkState();
+    try {  
+        myField.moveUser(userInput.toLowerCase());
+        state = myField.checkState();
 
-    if (state == 'win')
-        console.log('You foung your hat!');
+        if (state == 'win')
+            console.log('You foung your hat!');
 
-    if (state == 'lose')
-        console.log('You lost');
+        if (state == 'lose')
+            console.log('You lost');
+    } catch (error) {
+        console.log(error);
+    }
 }

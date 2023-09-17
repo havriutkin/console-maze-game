@@ -9,6 +9,7 @@
   "author": "Vladyslav Havriutkin",
   "license": "ISC",
   "dependencies": {
-    "prompt-sync": "^4.2.0"
+    "prompt-sync": "^4.2.0",
+    "terminal-kit": "^3.0.0"
   }
 }
