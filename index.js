@@ -24,7 +24,7 @@ class Field{
         // Function takes direction and changes user's position
         switch (direction) {
             case 'w': {
-                this._userPos.y++;
+                this._userPos.y--;
                 break;
             }
 
@@ -34,7 +34,7 @@ class Field{
             }
 
             case 's': {
-                this._userPos.y--;
+                this._userPos.y++;
                 break;
             }
 
@@ -49,20 +49,27 @@ class Field{
         }
     }
 
-    checkUser(){
-        // Function returns true if user is still alive, returns false otherwise
+    checkState(){
+        // Function returns current game state based on user position
         const {x, y} = this._userPos;
 
-        if (this._map[y][x] == hole) 
-            return false
-
         if (x > this._width - 1 || x < 0)
-            return false
+            return 'lose'
 
         if (y > this._height - 1 || y < 0)
-            return false
+            return 'lose'
 
-        return true;
+        if (this._map[y][x] == hole) 
+            return 'lose'
+
+        if (this._map[y][x] == hat)
+            return 'win';
+
+        return 'run';
+    }
+
+    updateMap(){
+        this._map[this._userPos.y][this._userPos.x] = pathCharacter;
     }
 
     static generateMap(width, height, percentage){
@@ -77,4 +84,19 @@ const myField = new Field([
     ['░', '^', '░'],
 ]);
 
-myField.print();
+let state = 'run';  // Possible states: run, win, lose
+while (state === 'run'){
+    myField.updateMap();
+    myField.print();
+
+    let userInput = prompt('Which way? ');
+
+    myField.moveUser(userInput.toLowerCase());
+    state = myField.checkState();
+
+    if (state == 'win')
+        console.log('You foung your hat!');
+
+    if (state == 'lose')
+        console.log('You lost');
+}
